@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:background="#ff000000" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@drawable/paobu" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TextView android:textSize="30.0sp" android:textColor="#ddffffff" android:gravity="center_vertical" android:id="@id/tips" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginLeft="35.0dip" android:layout_marginRight="35.0dip" android:text="@string/custom_tip" android:shadowColor="#33000000" android:shadowDx="1.0" android:shadowDy="1.0" android:layout_centerInParent="true" />
+        <RelativeLayout android:id="@id/content_layout" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <TextView android:textSize="60.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:id="@id/steps_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:shadowColor="#33000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="4.0" android:layout_centerInParent="true" />
+            <TextView android:textSize="30.0sp" android:textColor="#ddffffff" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="-10.0dip" android:text="@string/lap_steps" android:shadowColor="#33000000" android:shadowDx="1.0" android:shadowDy="1.0" android:layout_above="@id/steps_value" android:layout_centerHorizontal="true" />
+            <LinearLayout android:gravity="center" android:orientation="horizontal" android:id="@id/distance_layout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="-20.0dip" android:layout_below="@id/steps_value" android:layout_centerHorizontal="true">
+                <TextView android:textSize="30.0sp" android:textColor="#ddffffff" android:gravity="center" android:id="@id/distance_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="30.0dip" android:shadowColor="#33000000" />
+                <TextView android:textSize="30.0sp" android:textColor="#ddffffff" android:gravity="center" android:id="@id/time_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="30.0dip" android:shadowColor="#33000000" />
+            </LinearLayout>
+        </RelativeLayout>
+        <LinearLayout android:gravity="center_horizontal" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="40.0dip" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true">
+            <Button android:textSize="24.0sp" android:id="@id/control_start" android:background="@drawable/button_start" android:padding="3.0dip" android:layout_width="60.0dip" android:layout_height="60.0dip" />
+            <Button android:textSize="24.0sp" android:id="@id/control_stop" android:background="@drawable/button_stop" android:padding="3.0dip" android:visibility="visible" android:layout_width="60.0dip" android:layout_height="60.0dip" android:layout_marginLeft="10.0dip" />
+            <Button android:textSize="24.0sp" android:id="@id/control_restart" android:background="@drawable/button_restart" android:padding="3.0dip" android:visibility="gone" android:layout_width="60.0dip" android:layout_height="60.0dip" android:layout_marginLeft="10.0dip" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

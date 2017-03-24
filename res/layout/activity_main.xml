@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    android:background="@drawable/paobu" 
+    android:padding="5.0dip" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView 
+        android:textSize="30.0sp" 
+        android:textColor="#ddffffff" 
+        android:id="@+id/steps" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="90.0dip" 
+        android:text="@string/today_steps" 
+        android:shadowColor="#33000000" 
+        android:shadowDx="1.0" 
+        android:shadowDy="1.0" 
+        android:shadowRadius="2.0" 
+        android:layout_centerHorizontal="true" />
+    <TextView 
+        android:textSize="66.0sp" 
+        android:textStyle="bold" 
+        android:textColor="#ffffffff" 
+        android:id="@+id/total_steps" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="3.0dip" 
+        android:shadowColor="#33000000" 
+        android:shadowDx="2.0" 
+        android:shadowDy="2.0" 
+        android:shadowRadius="4.0" 
+        android:layout_below="@id/steps" 
+        android:layout_centerHorizontal="true" />
+    <TextView 
+        android:textSize="30.0sp" 
+        android:textColor="#ddffffff" 
+        android:gravity="left" 
+        android:id="@+id/distance_values" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="3.0dip" 
+        android:shadowColor="#33000000" 
+        android:shadowDx="1.0" 
+        android:shadowDy="1.0" 
+        android:shadowRadius="1.0" 
+        android:layout_below="@id/total_steps" 
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

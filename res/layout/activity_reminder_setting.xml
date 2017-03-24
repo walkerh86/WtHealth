@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:background="@android:color/white" android:padding="5.0dip" android:scrollbars="none" android:layout_width="fill_parent" android:layout_height="wrap_content" android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:paddingTop="15.0dip" android:paddingBottom="15.0dip" android:layout_width="fill_parent" android:layout_height="800.0dip" android:layout_marginBottom="40.0dip" android:divider="@android:drawable/divider_horizontal_bright" android:showDividers="middle">
+        <RelativeLayout android:id="@id/start_time_layout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="50.0dip" android:layout_marginRight="60.0dip">
+            <TextView android:textSize="28.0sp" android:textColor="@color/gray" android:id="@id/start_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/start_time" />
+            <TextView android:textSize="26.0sp" android:id="@id/starttime_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/defalut_start_time" android:layout_below="@id/start_time" />
+            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/edit" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+        <RelativeLayout android:id="@id/end_time_layout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="50.0dip" android:layout_marginRight="60.0dip">
+            <TextView android:textSize="28.0sp" android:textColor="@color/gray" android:id="@id/start_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/end_time" />
+            <TextView android:textSize="26.0sp" android:id="@id/endtime_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/default_end_time" android:layout_below="@id/start_time" />
+            <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/edit" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        </RelativeLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="70.0dip" android:layout_marginLeft="50.0dip" android:layout_marginRight="50.0dip">
+            <TextView android:textSize="30.0sp" android:textColor="@color/gray" android:id="@id/open_all" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/Reminder" android:layout_weight="1.0" />
+            <ToggleButton android:gravity="center" android:id="@id/reminder_turn_on" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="false" android:button="@drawable/toggle_btn" android:textOn="@string/toggle_btn" android:textOff="@string/toggle_btn" android:text="@string/toggle_btn" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="70.0dip" android:layout_marginLeft="50.0dip" android:layout_marginRight="50.0dip">
+            <TextView android:textSize="30.0sp" android:textColor="@color/gray" android:id="@id/notification_sound" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/sound" android:layout_weight="1.0" />
+            <ToggleButton android:gravity="center" android:id="@id/sound_turn_on" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="false" android:button="@drawable/toggle_btn" android:textOn="@string/toggle_btn" android:textOff="@string/toggle_btn" android:text="@string/toggle_btn" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="70.0dip" android:layout_marginLeft="50.0dip" android:layout_marginRight="50.0dip">
+            <TextView android:textSize="30.0sp" android:textColor="@color/gray" android:id="@id/Vibration" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="@string/Vibration" android:layout_weight="1.0" />
+            <ToggleButton android:gravity="center" android:id="@id/vibrate_turn_on" android:background="@android:color/transparent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="false" android:button="@drawable/toggle_btn" android:textOn="@string/toggle_btn" android:textOff="@string/toggle_btn" android:text="@string/toggle_btn" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

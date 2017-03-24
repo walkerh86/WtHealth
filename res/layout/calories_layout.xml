@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:background="#ff000000" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@drawable/calories_bg" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:id="@id/cal_layout" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_centerInParent="true">
+            <TextView android:textSize="60.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:id="@id/calories" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:shadowColor="#33000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="4.0" android:layout_centerInParent="true" />
+            <TextView android:textSize="26.0sp" android:textColor="#ffffffff" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="13.0dip" android:text="@string/cal_unit" android:shadowColor="#33000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="4.0" android:layout_toRightOf="@id/calories" android:layout_alignBottom="@id/calories" />
+        </RelativeLayout>
+        <TextView android:textSize="30.0sp" android:textColor="#ffffffff" android:ellipsize="middle" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="-15.0dip" android:text="@string/calories" android:shadowColor="#33000000" android:shadowDx="2.0" android:shadowDy="2.0" android:shadowRadius="4.0" android:layout_above="@id/cal_layout" android:layout_centerHorizontal="true" />
+        <ImageView android:id="@id/set" android:layout_width="60.0px" android:layout_height="60.0px" android:layout_marginTop="10.0dip" android:src="@drawable/remind_settings" android:layout_below="@id/cal_layout" android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+</LinearLayout>

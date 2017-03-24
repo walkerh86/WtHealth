@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    android:id="@+id/widget_layout" 
+    android:background="@drawable/bg4" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView 
+        android:id="@+id/view" 
+        android:layout_width="10.0dip" 
+        android:layout_height="10.0dip" 
+        android:layout_centerInParent="true" />
+    <LinearLayout 
+        android:orientation="vertical" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_toLeftOf="@+id/view" 
+        android:layout_centerVertical="true">
+        <ImageButton 
+            android:gravity="center" 
+            android:id="@+id/heart_rate" 
+            android:background="@drawable/ic_launcher_heart" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:scaleType="fitXY" />
+        <TextView 
+            android:textSize="30.0sp" 
+            android:textColor="@android:color/white" 
+            android:ellipsize="middle" 
+            android:gravity="center" 
+            android:visibility="visible" 
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:text="@string/heart_rate" 
+            android:singleLine="true" 
+            android:shadowColor="#bb000000" 
+            android:shadowRadius="2.0" />
+    </LinearLayout>
+    <LinearLayout 
+        android:orientation="vertical" 
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_toRightOf="@id/view" 
+        android:layout_centerVertical="true">
+        <ImageButton 
+            android:gravity="center" 
+            android:id="@+id/walk" 
+            android:background="@drawable/ic_launcher_pedometer" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:scaleType="fitXY" />
+        <TextView 
+            android:textSize="30.0sp" 
+            android:textColor="@android:color/white" 
+            android:ellipsize="middle" 
+            android:gravity="center" 
+            android:visibility="visible" 
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content" 
+            android:text="@string/app_title" 
+            android:singleLine="true" 
+            android:shadowColor="#bb000000" 
+            android:shadowRadius="2.0" />
+    </LinearLayout>
+</RelativeLayout>

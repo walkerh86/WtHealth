@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="myStyle">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    <style name="reminder_text_style">
+        <item name="android:textSize">28.0sp</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">300.0dip</item>
+        <item name="android:layout_height">70.0dip</item>
+        <item name="android:drawablePadding">5.0dip</item>
+    </style>
+    <style name="reminderTheme" parent="@android:style/Theme.Holo">
+        <item name="android:background">@color/white</item>
+        <item name="android:actionBarStyle">@style/reminderBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+    <style name="reminderSettingTheme" parent="@android:style/Theme.Holo">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:actionBarStyle">@style/reminderBarStyle</item>
+    </style>
+    <style name="reminderBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/green</item>
+        <item name="android:height">80.0dip</item>
+        <item name="android:displayOptions">none</item>
+        <item name="android:backgroundStacked">@null</item>
+        <item name="android:backgroundSplit">@null</item>
+    </style>
+</resources>

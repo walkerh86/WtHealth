@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/show_setting" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="60.0px" android:layout_marginLeft="15.0px" android:layout_marginTop="20.0px" android:layout_marginRight="15.0px">
+            <TextView android:textSize="28.0px" android:ellipsize="middle" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/weight" />
+            <EditText android:textSize="28.0px" android:id="@id/weight_edt" android:background="@drawable/edittext_shape" android:padding="5.0px" android:layout_width="160.0px" android:layout_height="wrap_content" android:layout_marginLeft="5.0px" android:maxLength="3" android:numeric="decimal" android:layout_weight="1.0" />
+            <TextView android:textSize="28.0px" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0px" android:text="@string/weight_unit" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="60.0px" android:layout_marginLeft="15.0px" android:layout_marginRight="15.0px">
+            <TextView android:textSize="28.0px" android:ellipsize="middle" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/height" />
+            <EditText android:textSize="28.0px" android:id="@id/height_edt" android:background="@drawable/edittext_shape" android:padding="5.0px" android:layout_width="160.0px" android:layout_height="wrap_content" android:layout_marginLeft="5.0px" android:maxLength="3" android:numeric="decimal" android:layout_weight="1.0" />
+            <TextView android:textSize="28.0px" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dip" android:text="@string/height_unit" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="60.0px" android:layout_marginLeft="15.0px" android:layout_marginRight="15.0px">
+            <RadioGroup android:orientation="horizontal" android:id="@id/genda_check" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <RadioButton android:textSize="28.0px" android:textColor="@android:color/black" android:ellipsize="end" android:id="@id/male" android:layout_width="0.0dip" android:layout_height="wrap_content" android:checked="true" android:button="@drawable/doc_selector" android:text="@string/man" android:singleLine="true" android:layout_weight="1.0" />
+                <RadioButton android:textColor="@android:color/black" android:ellipsize="end" android:id="@id/female" android:layout_width="0.0dip" android:layout_height="wrap_content" android:button="@drawable/doc_selector" android:text="@string/female" android:singleLine="true" android:layout_weight="1.0" />
+            </RadioGroup>
+        </LinearLayout>
+        <Button android:textSize="28.0px" android:ellipsize="middle" android:id="@id/confirm" android:background="@drawable/button_selector_2" android:layout_width="120.0dip" android:layout_height="50.0dip" android:layout_marginTop="10.0px" android:text="@string/confirm" />
+    </LinearLayout>
+</LinearLayout>
