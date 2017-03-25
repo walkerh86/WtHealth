@@ -49,9 +49,9 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_provider"/>
         </receiver>
-        <service android:name=".PedometerService">
+        <service android:name=".StepService">
             <intent-filter>
-                <action android:name="creator.android.SHealth.action.PedometerService"/>
+                <action android:name="com.wt.health.action.StepService"/>
             </intent-filter>
         </service>
         <receiver android:name=".BootReceiver">

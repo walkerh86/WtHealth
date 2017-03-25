@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:scrollbars="none" android:layout_width="fill_parent" android:layout_height="wrap_content"
+<ScrollView 
+    android:scrollbars="none" 
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="10.0dip">
-        <TextView android:textSize="38.0sp" android:textColor="@color/orange" android:id="@id/month" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        <include android:layout_marginTop="15.0dip" layout="@layout/head_view" />
-        <ListView android:id="@id/data_list" android:padding="5.0dip" android:scrollbars="none" android:layout_width="fill_parent" android:layout_height="320.0dip" android:layout_marginLeft="15.0dip" android:layout_marginTop="10.0dip" android:layout_marginRight="15.0dip" android:layout_marginBottom="0.0dip" android:divider="@null" />
+    <LinearLayout 
+        android:gravity="center" 
+        android:orientation="vertical" 
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="10.0dip">
+        <TextView 
+            android:textSize="38.0sp" 
+            android:textColor="@color/orange" 
+            android:id="@+id/month" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" />
+        <include
+            layout="@layout/head_view" />
+        <ListView 
+            android:id="@+id/data_list" 
+            android:padding="5.0dip" 
+            android:scrollbars="none" 
+            android:layout_width="fill_parent" 
+            android:layout_height="320.0dip" 
+            android:layout_marginLeft="15.0dip" 
+            android:layout_marginTop="10.0dip" 
+            android:layout_marginRight="15.0dip" 
+            android:layout_marginBottom="0.0dip" 
+            android:divider="@null" />
     </LinearLayout>
 </ScrollView>

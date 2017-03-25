@@ -99,4 +99,5 @@
     <string name="hour">" h "</string>
     <string name="hours">" h "</string>
     <string name="interval_time">Interval time</string>
+    <string name="unit_km">km</string>
 </resources>
