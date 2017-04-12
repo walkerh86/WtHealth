@@ -29,7 +29,9 @@ public class HealthWiget extends AppWidgetProvider{
 	private void performUpdate(Context context,AppWidgetManager appWidgetManager, int[] appWidgetIds,long[] changedEventIds) {            
 		for (int appWidgetId : appWidgetIds) {
 			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.activity_main);
-			appWidgetManager.updateAppWidget(appWidgetId, views);			
+			appWidgetManager.updateAppWidget(appWidgetId, views);
+			views.setTextViewText(R.id.total_steps, "0");
+			views.setTextViewText(R.id.distance_values, "0KM");
 		}
 	}
 
