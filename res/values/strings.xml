@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Pedometer</string>
     <string name="app_title">Pedometer</string>
+    <string name="step_seprator">:</string>
     <string name="steps">Steps</string>
     <string name="kcal">Kcal</string>
     <string name="distance">KM</string>

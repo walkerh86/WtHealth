@@ -45,7 +45,7 @@ public class Utils implements TextToSpeech.OnInitListener {
         Log.i(TAG, "Shutting Down TextToSpeech...");
 
         mSpeakingEngineAvailable = false;
-        mTts.shutdown();
+        //mTts.shutdown();
         Log.i(TAG, "TextToSpeech Shut Down.");
 
     }

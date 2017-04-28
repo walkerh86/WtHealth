@@ -138,24 +138,27 @@ public class CurrentWalkActivity extends Activity {
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         mPedometerSettings = new PedometerSettings(mSettings);
         
-        mUtils.setSpeak(mSettings.getBoolean("speak", false));
+        //mUtils.setSpeak(mSettings.getBoolean("speak", false));
         
         // Read from preferences if the service was running on the last onPause
-        mIsRunning = mPedometerSettings.isServiceRunning();
-        
-        updateBtn();
+        mIsRunning = mPedometerSettings.isServiceRunning(); 
         
         // Start the service if this is considered to be an application start (last onPause was long ago)
-        /*
         if (!mIsRunning && mPedometerSettings.isNewStart()) {
             startStepService();
             bindStepService();
         }
         else if (mIsRunning) {
             bindStepService();
+        }else{
+        	SharedPreferences mState = getSharedPreferences("state", 0);
+        	mStepValueView.setText(String.valueOf(mState.getInt("steps", 0)));
+        	mDistanceValueView.setText(String.valueOf(mState.getFloat("distance", 0)).substring(0, 5));
         }
-        */
-        mPedometerSettings.clearServiceRunning();        
+        
+        mPedometerSettings.clearServiceRunning();  
+        
+        updateBtn();
     }
     
     @Override

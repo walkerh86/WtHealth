@@ -102,7 +102,7 @@ public class StepService extends Service {
 
         mUtils = Utils.getInstance();
         mUtils.setService(this);
-        mUtils.initTTS();
+        //mUtils.initTTS();
 
         acquireWakeLock();
         

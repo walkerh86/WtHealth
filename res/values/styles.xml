@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="steps_style">
+        <item name="android:textSize">32.0sp</item>
+        <item name="android:textColor">#ffd8d8a5</item>
+    </style>
+    
     <style name="myStyle">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
