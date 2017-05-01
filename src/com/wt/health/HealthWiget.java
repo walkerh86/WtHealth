@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 public class HealthWiget extends AppWidgetProvider{
@@ -27,11 +28,15 @@ public class HealthWiget extends AppWidgetProvider{
     }
 	
 	private void performUpdate(Context context,AppWidgetManager appWidgetManager, int[] appWidgetIds,long[] changedEventIds) {            
+		Log.i(TAG, "performUpdate appWidgetIds="+appWidgetIds);
 		for (int appWidgetId : appWidgetIds) {
-			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.activity_main);
+			Log.i(TAG, "performUpdate appWidgetId="+appWidgetId);
+			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.health_layout);
 			appWidgetManager.updateAppWidget(appWidgetId, views);
-			views.setTextViewText(R.id.total_steps, "0");
-			views.setTextViewText(R.id.distance_values, "0KM");
+			views.setTextViewText(R.id.steps_value, "0");
+			views.setTextViewText(R.id.distance_value, "0");
+			views.setViewVisibility(R.id.control_stop, View.GONE);
+			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}
 	}
 
