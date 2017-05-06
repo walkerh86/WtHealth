@@ -30,9 +30,9 @@ public class HealthWiget extends AppWidgetProvider{
     }
 	
 	public static  void performUpdate(Context context,AppWidgetManager appWidgetManager, int[] appWidgetIds,long[] changedEventIds) {            
-		Log.i(TAG, "performUpdate appWidgetIds="+appWidgetIds);
+		//Log.i(TAG, "performUpdate appWidgetIds="+appWidgetIds);
 		for (int appWidgetId : appWidgetIds) {
-			Log.i(TAG, "performUpdate appWidgetId="+appWidgetId);
+			//Log.i(TAG, "performUpdate appWidgetId="+appWidgetId);
 			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.health_layout);
 			
 	        	PedometerSettings settings = PedometerSettings.getInstance(context);

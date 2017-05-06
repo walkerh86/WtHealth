@@ -116,7 +116,7 @@ public class StepDetector implements SensorEventListener
                 }
                 
                 if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra && isTimeEnough) {
-                    Log.i(TAG, "step");
+                    //Log.i(TAG, "step");
                     notifyStep();
                     mLastMatch = extType;
                     mLastStepTimeMillis = timeMillis;

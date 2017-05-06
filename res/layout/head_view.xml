@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="horizontal" android:background="@android:color/white" android:layout_width="fill_parent" android:layout_height="wrap_content"
+<LinearLayout 
+    android:orientation="horizontal" 
+    android:background="@android:color/white" 
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView android:textSize="30.0sp" android:textColor="#ffffa500" android:gravity="center" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/Date" android:layout_weight="1.0" />
-    <TextView android:textSize="30.0sp" android:textColor="#ffffa500" android:gravity="center" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/steps" android:layout_weight="1.0" />
-    <TextView android:textSize="30.0sp" android:textColor="#ffffa500" android:gravity="center" android:layout_width="0.0dip" android:layout_height="fill_parent" android:text="@string/distance1" android:layout_weight="1.0" />
+    <TextView 
+        android:textSize="30.0sp" 
+        android:textColor="#ffffa500" 
+        android:gravity="center" 
+        android:layout_width="0.0dip" 
+        android:layout_height="fill_parent" 
+        android:text="@string/Date" 
+        android:layout_weight="1.0" />
+    <TextView 
+        android:textSize="30.0sp" 
+        android:textColor="#ffffa500" 
+        android:gravity="center" 
+        android:layout_width="0.0dip" 
+        android:layout_height="fill_parent" 
+        android:text="@string/steps" 
+        android:layout_weight="1.0" />
+    <TextView 
+        android:textSize="30.0sp" 
+        android:textColor="#ffffa500" 
+        android:gravity="center" 
+        android:layout_width="0.0dip" 
+        android:layout_height="fill_parent" 
+        android:text="@string/distance1" 
+        android:layout_weight="1.0" />
 </LinearLayout>

@@ -18,6 +18,9 @@
 
 package com.wt.health;
 
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,10 +28,15 @@ import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Binder;
@@ -54,37 +62,47 @@ import android.widget.Toast;
  */
 public class StepService extends Service {
 	private static final String TAG = "hcj.StepService";
-    private SharedPreferences mSettings;
     private PedometerSettings mPedometerSettings;
-    private SharedPreferences mState;
-    private SharedPreferences.Editor mStateEditor;
     private Utils mUtils;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private StepDetector mStepDetector;
     // private StepBuzzer mStepBuzzer; // used for debugging
     private StepDisplayer mStepDisplayer;
-    private PaceNotifier mPaceNotifier;
     private DistanceNotifier mDistanceNotifier;
-    private SpeedNotifier mSpeedNotifier;
-    private CaloriesNotifier mCaloriesNotifier;
-    private SpeakingTimer mSpeakingTimer;
     
     private PowerManager.WakeLock wakeLock;
     private NotificationManager mNM;
 
     private int mSteps;
-    //private int mPace;
     private float mDistance;
-    //private float mSpeed;
-    //private float mCalories;
 
+	private static final SimpleDateFormat mDateSdf = new SimpleDateFormat("yyyy-MM-dd");
 	private Handler mHandler = new Handler();
 	private Runnable mUpdateWidgetRunnable = new Runnable(){
 		@Override
 		public void run(){
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(StepService.this);
 			HealthWiget.performUpdate(StepService.this, appWidgetManager,appWidgetManager.getAppWidgetIds(new ComponentName(StepService.this, HealthWiget.class)),null);
+		}
+	};
+	
+	private Runnable mDateChangeRunnable = new Runnable(){
+		@Override
+		public void run(){
+			String date = getCurrentDate();
+			Log.i(TAG,"mDateChangeRunnable date="+date);
+			final ContentResolver cr = StepService.this.getContentResolver();
+			Cursor cursor = cr.query(StepHealth.CONTENT_URI, StepHealth.ALL_PROJECTION, "date=?", new String[] { date }, null);
+			if ((cursor != null) && (cursor.getCount() > 0)){
+				ContentValues values = new ContentValues();
+				values.put("steps", Integer.valueOf(mSteps));
+				cursor.close();
+				cr.update(StepHealth.CONTENT_URI, values, "date=?", new String[] { date });
+				return;
+			}
+			insert(cr, date);
+			resetValues();
 		}
 	};
     
@@ -107,14 +125,10 @@ public class StepService extends Service {
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         showNotification();
         
-        // Load settings
-        //mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         mPedometerSettings = PedometerSettings.getInstance(this);
-        //mState = getSharedPreferences("state", 0);
 
         mUtils = Utils.getInstance();
         mUtils.setService(this);
-        //mUtils.initTTS();
 
         acquireWakeLock();
         
@@ -123,46 +137,19 @@ public class StepService extends Service {
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         registerDetector();
 
-        // Register our receiver for the ACTION_SCREEN_OFF action. This will make our receiver
-        // code be called whenever the phone enters standby mode.
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction("android.intent.action.DATE_CHANGED");
         registerReceiver(mReceiver, filter);
 
         mStepDisplayer = new StepDisplayer(mPedometerSettings, mUtils);
         mStepDisplayer.setSteps(mSteps = mPedometerSettings.getTodaySteps());
         mStepDisplayer.addListener(mStepListener);
         mStepDetector.addStepListener(mStepDisplayer);
-/*
-        mPaceNotifier     = new PaceNotifier(mPedometerSettings, mUtils);
-        mPaceNotifier.setPace(mPace = mState.getInt("pace", 0));
-        mPaceNotifier.addListener(mPaceListener);
-        mStepDetector.addStepListener(mPaceNotifier);
-*/
+
         mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings, mUtils);
         mDistanceNotifier.setDistance(mDistance = mPedometerSettings.getTodayDistance());
         mStepDetector.addStepListener(mDistanceNotifier);
-/*        
-        mSpeedNotifier    = new SpeedNotifier(mSpeedListener,    mPedometerSettings, mUtils);
-        mSpeedNotifier.setSpeed(mSpeed = mState.getFloat("speed", 0));
-        mPaceNotifier.addListener(mSpeedNotifier);
-        
-        mCaloriesNotifier = new CaloriesNotifier(mCaloriesListener, mPedometerSettings, mUtils);
-        mCaloriesNotifier.setCalories(mCalories = mState.getFloat("calories", 0));
-        mStepDetector.addStepListener(mCaloriesNotifier);
-        
-        mSpeakingTimer = new SpeakingTimer(mPedometerSettings, mUtils);
-        mSpeakingTimer.addListener(mStepDisplayer);
-        mSpeakingTimer.addListener(mPaceNotifier);
-        mSpeakingTimer.addListener(mDistanceNotifier);
-        mSpeakingTimer.addListener(mSpeedNotifier);
-        mSpeakingTimer.addListener(mCaloriesNotifier);
-        mStepDetector.addStepListener(mSpeakingTimer);
-*/        
-        // Used when debugging:
-        // mStepBuzzer = new StepBuzzer(this);
-        // mStepDetector.addStepListener(mStepBuzzer);
 
-        // Start voice
         reloadSettings();
     }
     
@@ -180,14 +167,7 @@ public class StepService extends Service {
         // Unregister our receiver.
         unregisterReceiver(mReceiver);
         unregisterDetector();
-        /*
-        mStateEditor = mState.edit();
-        mStateEditor.putInt("steps", mSteps);
-        mStateEditor.putInt("pace", mPace);
-        mStateEditor.putFloat("distance", mDistance);
-        mStateEditor.putFloat("speed", mSpeed);
-        mStateEditor.putFloat("calories", mCalories);
-        mStateEditor.commit();*/
+		
         mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
         
         mNM.cancel(R.string.app_name);
@@ -240,33 +220,7 @@ public class StepService extends Service {
         //mStepDisplayer.passValue();
         //mPaceListener.passValue();
     }
-    
-    private int mDesiredPace;
-    private float mDesiredSpeed;
-    
-    /**
-     * Called by activity to pass the desired pace value, 
-     * whenever it is modified by the user.
-     * @param desiredPace
-     */
-    public void setDesiredPace(int desiredPace) {
-        mDesiredPace = desiredPace;
-        if (mPaceNotifier != null) {
-            mPaceNotifier.setDesiredPace(mDesiredPace);
-        }
-    }
-    /**
-     * Called by activity to pass the desired speed value, 
-     * whenever it is modified by the user.
-     * @param desiredSpeed
-     */
-    public void setDesiredSpeed(float desiredSpeed) {
-        mDesiredSpeed = desiredSpeed;
-        if (mSpeedNotifier != null) {
-            mSpeedNotifier.setDesiredSpeed(mDesiredSpeed);
-        }
-    }
-    
+        
     public void reloadSettings() {
         //mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         
@@ -277,19 +231,12 @@ public class StepService extends Service {
         }
         
         if (mStepDisplayer    != null) mStepDisplayer.reloadSettings();
-        if (mPaceNotifier     != null) mPaceNotifier.reloadSettings();
         if (mDistanceNotifier != null) mDistanceNotifier.reloadSettings();
-        if (mSpeedNotifier    != null) mSpeedNotifier.reloadSettings();
-        if (mCaloriesNotifier != null) mCaloriesNotifier.reloadSettings();
-        if (mSpeakingTimer    != null) mSpeakingTimer.reloadSettings();
     }
     
     public void resetValues() {
-        mStepDisplayer.setSteps(0);
-        mPaceNotifier.setPace(0);
-        mDistanceNotifier.setDistance(0);
-        mSpeedNotifier.setSpeed(0);
-        mCaloriesNotifier.setCalories(0);
+        mStepDisplayer.setSteps(mSteps = 0);
+        mDistanceNotifier.setDistance(mDistance = 0f);
     }
     
     /**
@@ -385,8 +332,8 @@ public class StepService extends Service {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Check action just to be on the safe side.
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+            String action = intent.getAction();
+            if (Intent.ACTION_SCREEN_OFF.equals(action)) {
                 // Unregisters the listener and registers it again.
                 StepService.this.unregisterDetector();
                 StepService.this.registerDetector();
@@ -394,6 +341,8 @@ public class StepService extends Service {
                     wakeLock.release();
                     acquireWakeLock();
                 }
+            }else if("android.intent.action.DATE_CHANGED".equals(action)){
+            	  mHandler.post(mDateChangeRunnable);
             }
         }
     };
@@ -415,11 +364,29 @@ public class StepService extends Service {
     }
 
     private void saveSteps(){
-		Settings.System.putInt(this.getContentResolver(),"today_steps",mSteps);
+        Settings.System.putInt(this.getContentResolver(),"today_steps",mSteps);
     }
 
     private void saveDistance(){
-		Settings.System.putFloat(this.getContentResolver(),"today_distance",mDistance);
+        Settings.System.putFloat(this.getContentResolver(),"today_distance",mDistance);
     }
+
+	public static String getCurrentDate(){
+		String date = null;
+		try{
+			date = mDateSdf.format(new GregorianCalendar().getTime());
+		}catch (Exception e){
+		}
+		return date;
+	}
+
+	public void insert(ContentResolver cr, String date){
+		Log.i(TAG,"insert date="+date);
+		ContentValues values = new ContentValues();
+		values.put("date", date);
+		values.put("steps", mSteps);
+		values.put("diatance", mDistance);
+		cr.insert(StepHealth.CONTENT_URI, values);
+	}
 }
 

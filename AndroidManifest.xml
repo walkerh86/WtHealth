@@ -30,6 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".HistoryDataActivity"/>        
         <!--  
         <receiver android:name=".DateChangeReceiver">
             <intent-filter>
@@ -68,7 +69,7 @@
             <intent-filter/>
         </service>
         <service android:name=".SendService"/>
-        <!-- <provider android:authorities="com.wt.health.user" android:exported="true" android:name=".UserProvider"/>
-         -->
+        <provider android:authorities="com.wt.health" android:exported="true" android:name=".StepProvider"/>
+        
     </application>
 </manifest>

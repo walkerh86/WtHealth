@@ -95,6 +95,9 @@ public class CurrentWalkActivity extends Activity {
         mStopBtn.setOnClickListener(mOnClickListener);
         mRestartBtn = (Button)findViewById(R.id.control_restart);
         mRestartBtn.setOnClickListener(mOnClickListener);
+
+	 View btnHistory = findViewById(R.id.btn_history);
+	 btnHistory.setOnClickListener(mOnClickListener);
         
         mUtils = Utils.getInstance();
 	 mPedometerSettings = PedometerSettings.getInstance(this);
@@ -126,12 +129,16 @@ public class CurrentWalkActivity extends Activity {
     private View.OnClickListener mOnClickListener = new View.OnClickListener(){
     	@Override
     	public void onClick(View view){
-    		if(view == mStartBtn){
+    		int id = view.getId();
+    		if(id == R.id.control_start){
     			startPedometer();
-    		}else if(view == mStopBtn){
+			updateBtn();
+    		}else if(id == R.id.control_stop){
     			stopPedometer();
+			updateBtn();
+    		}else if(id == R.id.btn_history){
+    			startHistoryActivity();
     		}
-    		updateBtn();
     	}
     };
     
@@ -184,18 +191,6 @@ public class CurrentWalkActivity extends Activity {
         super.onDestroy();
     }
 
-    private void setDesiredPaceOrSpeed(float desiredPaceOrSpeed) {
-        if (mService != null) {
-            if (mMaintain == PedometerSettings.M_PACE) {
-                mService.setDesiredPace((int)desiredPaceOrSpeed);
-            }
-            else
-            if (mMaintain == PedometerSettings.M_SPEED) {
-                mService.setDesiredSpeed(desiredPaceOrSpeed);
-            }
-        }
-    }
-    
     private void savePaceSetting() {
         mPedometerSettings.savePaceOrSpeedSetting(mMaintain, mDesiredPaceOrSpeed);
     }
@@ -344,5 +339,8 @@ public class CurrentWalkActivity extends Activity {
         
     };
     
-
+	private void startHistoryActivity(){
+		Intent intent = new Intent(this,HistoryDataActivity.class);
+		this.startActivity(intent);
+	}
 }
