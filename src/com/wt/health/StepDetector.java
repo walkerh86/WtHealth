@@ -24,6 +24,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 /**
@@ -43,6 +44,7 @@ public class StepDetector implements SensorEventListener
     private float   mLastExtremes[][] = { new float[3*2], new float[3*2] };
     private float   mLastDiff[] = new float[3*2];
     private int     mLastMatch = -1;
+    private long mLastStepTimeMillis;
     
     private ArrayList<StepListener> mStepListeners = new ArrayList<StepListener>();
     
@@ -51,6 +53,7 @@ public class StepDetector implements SensorEventListener
         mYOffset = h * 0.5f;
         mScale[0] = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
         mScale[1] = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
+        mLastStepTimeMillis = SystemClock.uptimeMillis();
     }
     
     public void setSensitivity(float sensitivity) {
@@ -67,11 +70,8 @@ public class StepDetector implements SensorEventListener
         synchronized (this) {
             if (sensor.getType() == Sensor.TYPE_ORIENTATION) {
             	android.util.Log.i(TAG, "onSensorChanged TYPE_ORIENTATION");
-            }
-            else {
-                int j = (sensor.getType() == Sensor.TYPE_ACCELEROMETER) ? 1 : 0;
-                android.util.Log.i(TAG, "onSensorChanged j="+j);
-                if (j == 1) {
+            }else {
+                if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 	detectStepByAccMethod1(event);
                 }
             }
@@ -109,11 +109,17 @@ public class StepDetector implements SensorEventListener
                 boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff[k]*2/3);
                 boolean isPreviousLargeEnough = mLastDiff[k] > (diff/3);
                 boolean isNotContra = (mLastMatch != 1 - extType);
+                boolean isTimeEnough = false;
+                long timeMillis = SystemClock.uptimeMillis();
+                if(timeMillis - mLastStepTimeMillis > 200){
+                	isTimeEnough = true;
+                }
                 
-                if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
+                if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra && isTimeEnough) {
                     Log.i(TAG, "step");
                     notifyStep();
                     mLastMatch = extType;
+                    mLastStepTimeMillis = timeMillis;
                 }
                 else {
                     mLastMatch = -1;

@@ -18,7 +18,10 @@
 
 package com.wt.health;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * Wrapper for {@link SharedPreferences}, handles preferences-related tasks.
@@ -31,9 +34,19 @@ public class PedometerSettings {
     public static int M_NONE = 1;
     public static int M_PACE = 2;
     public static int M_SPEED = 3;
+
+    private static PedometerSettings mPedometerSettings;
+    private static final String DISTANCE_FORMAT_STR = "%1$.2f";
     
-    public PedometerSettings(SharedPreferences settings) {
-        mSettings = settings;
+    private PedometerSettings(Context context) {
+        mSettings = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public static PedometerSettings getInstance(Context context){
+	if(mPedometerSettings == null){
+		mPedometerSettings = new PedometerSettings(context);
+	}
+	return mPedometerSettings;
     }
     
     public boolean isMetric() {
@@ -146,34 +159,64 @@ public class PedometerSettings {
     //
     // Internal
     
-    public void saveServiceRunningWithTimestamp(boolean running) {
+    public void setPedometerState(boolean running) {
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("service_running", running);
-        editor.putLong("last_seen", Utils.currentTimeInMillis());
+        editor.putBoolean("pedometer_start", running);
+        //editor.putLong("last_seen", Utils.currentTimeInMillis());
         editor.commit();
     }
     
-    public void saveServiceRunningWithNullTimestamp(boolean running) {
-        SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("service_running", running);
-        editor.putLong("last_seen", 0);
-        editor.commit();
-    }
-
     public void clearServiceRunning() {
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean("service_running", false);
+        editor.putBoolean("pedometer_start", false);
         editor.putLong("last_seen", 0);
         editor.commit();
     }
 
-    public boolean isServiceRunning() {
-        return mSettings.getBoolean("service_running", false);
+    public boolean isPedometerStart() {
+        return mSettings.getBoolean("pedometer_start", false);
     }
     
     public boolean isNewStart() {
         // activity last paused more than 10 minutes ago
         return mSettings.getLong("last_seen", 0) < Utils.currentTimeInMillis() - 1000*60*10;
     }
+    
+    public void startPedometerService(Context context){
+	setPedometerState(true);
+    	context.startService(new Intent(context,StepService.class));                
+    }
+	
+    public void stopPedometerService(Context context){
+	setPedometerState(false);
+    	context.stopService(new Intent(context,StepService.class));                
+    }
 
+    public int getTodaySteps(){
+	return mSettings.getInt("steps", 0);
+    }
+    
+    public float getTodayDistance(){
+	return mSettings.getFloat("distance", 0);
+    }
+
+    public String getFormatDistance(){
+	float distance = mSettings.getFloat("distance", 0);
+	return String.format(DISTANCE_FORMAT_STR,distance);
+    }
+
+    public String getFormatDistance(float distance){
+	return String.format(DISTANCE_FORMAT_STR,distance);
+    }
+
+    public void setTodayStepDistance(int step, float distance){
+	SharedPreferences.Editor editor = mSettings.edit();
+	editor.putInt("steps", step);
+	editor.putFloat("distance", distance);
+	editor.commit();
+    }
+
+    public String getSensitivity(){
+	return mSettings.getString("sensitivity", "10");
+    }
 }

@@ -40,7 +40,6 @@ import android.widget.TextView;
 
 public class CurrentWalkActivity extends Activity {
 	private static final String TAG = "hcj.CurrentWalkActivity";
-    private SharedPreferences mSettings;
     private PedometerSettings mPedometerSettings;
     private Utils mUtils;
     
@@ -98,10 +97,24 @@ public class CurrentWalkActivity extends Activity {
         mRestartBtn.setOnClickListener(mOnClickListener);
         
         mUtils = Utils.getInstance();
+	 mPedometerSettings = PedometerSettings.getInstance(this);
+	 if(mPedometerSettings.isPedometerStart()){
+	 	startPedometer();
+	 }
     }
+
+	private void startPedometer(){
+		startStepService();
+	 	bindStepService();
+	}
+
+	private void stopPedometer(){
+		unbindStepService();
+		stopStepService();
+	}
     
     private void updateBtn(){
-    	if(mIsRunning){
+    	if(mPedometerSettings.isPedometerStart()){
     		mStopBtn.setVisibility(View.VISIBLE);
     		mStartBtn.setVisibility(View.GONE);
     	}else{
@@ -114,11 +127,9 @@ public class CurrentWalkActivity extends Activity {
     	@Override
     	public void onClick(View view){
     		if(view == mStartBtn){
-    			startStepService();
-                bindStepService();
+    			startPedometer();
     		}else if(view == mStopBtn){
-    			unbindStepService();
-                stopStepService();
+    			stopPedometer();
     		}
     		updateBtn();
     	}
@@ -134,29 +145,11 @@ public class CurrentWalkActivity extends Activity {
     protected void onResume() {
         Log.i(TAG, "[ACTIVITY] onResume");
         super.onResume();
-        
-        mSettings = PreferenceManager.getDefaultSharedPreferences(this);
-        mPedometerSettings = new PedometerSettings(mSettings);
-        
-        //mUtils.setSpeak(mSettings.getBoolean("speak", false));
-        
-        // Read from preferences if the service was running on the last onPause
-        mIsRunning = mPedometerSettings.isServiceRunning(); 
-        
-        // Start the service if this is considered to be an application start (last onPause was long ago)
-        if (!mIsRunning && mPedometerSettings.isNewStart()) {
-            startStepService();
-            bindStepService();
-        }
-        else if (mIsRunning) {
-            bindStepService();
-        }else{
-        	SharedPreferences mState = getSharedPreferences("state", 0);
-        	mStepValueView.setText(String.valueOf(mState.getInt("steps", 0)));
-        	mDistanceValueView.setText(String.valueOf(mState.getFloat("distance", 0)).substring(0, 5));
-        }
-        
-        mPedometerSettings.clearServiceRunning();  
+		
+        //if(mPedometerSettings.isPedometerStart()){
+        	mStepValueView.setText(String.valueOf(mPedometerSettings.getTodaySteps()));
+        	mDistanceValueView.setText(mPedometerSettings.getFormatDistance());
+        //}
         
         updateBtn();
     }
@@ -164,16 +157,12 @@ public class CurrentWalkActivity extends Activity {
     @Override
     protected void onPause() {
         Log.i(TAG, "[ACTIVITY] onPause");
+/*
         if (mIsRunning) {
             unbindStepService();
         }
-        if (mQuitting) {
-            mPedometerSettings.saveServiceRunningWithNullTimestamp(mIsRunning);
-        }
-        else {
-            mPedometerSettings.saveServiceRunningWithTimestamp(mIsRunning);
-        }
-
+        mPedometerSettings.setPedometerState(mIsRunning);
+*/
         super.onPause();
         savePaceSetting();
     }
@@ -186,6 +175,7 @@ public class CurrentWalkActivity extends Activity {
 
     protected void onDestroy() {
         Log.i(TAG, "[ACTIVITY] onDestroy");
+	 unbindStepService();
         super.onDestroy();
     }
     
@@ -229,12 +219,9 @@ public class CurrentWalkActivity extends Activity {
     
 
     private void startStepService() {
-        if (! mIsRunning) {
             Log.i(TAG, "[SERVICE] Start");
             mIsRunning = true;
-            startService(new Intent(CurrentWalkActivity.this,
-                    StepService.class));
-        }
+            mPedometerSettings.startPedometerService(this);
     }
     
     private void bindStepService() {
@@ -253,11 +240,8 @@ public class CurrentWalkActivity extends Activity {
     
     private void stopStepService() {
         Log.i(TAG, "[SERVICE] Stop");
-        if (mService != null) {
             Log.i(TAG, "[SERVICE] stopService");
-            stopService(new Intent(CurrentWalkActivity.this,
-                  StepService.class));
-        }
+            mPedometerSettings.stopPedometerService(this);
         mIsRunning = false;
     }
     
@@ -284,38 +268,6 @@ public class CurrentWalkActivity extends Activity {
         }
     }
 
-    private static final int MENU_SETTINGS = 8;
-    private static final int MENU_QUIT     = 9;
-
-    private static final int MENU_PAUSE = 1;
-    private static final int MENU_RESUME = 2;
-    private static final int MENU_RESET = 3;
-    
-    /* Handles item selections */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case MENU_PAUSE:
-                unbindStepService();
-                stopStepService();
-                return true;
-            case MENU_RESUME:
-                startStepService();
-                bindStepService();
-                return true;
-            case MENU_RESET:
-                resetValues(true);
-                return true;
-            case MENU_QUIT:
-                resetValues(false);
-                unbindStepService();
-                stopStepService();
-                mQuitting = true;
-                finish();
-                return true;
-        }
-        return false;
-    }
- 
     // TODO: unite all into 1 type of message
     private StepService.ICallback mCallback = new StepService.ICallback() {
         public void stepsChanged(int value) {
@@ -361,11 +313,8 @@ public class CurrentWalkActivity extends Activity {
                     mDistanceValue = ((int)msg.arg1)/1000f;
                     if (mDistanceValue <= 0) { 
                         mDistanceValueView.setText("0");
-                    }
-                    else {
-                        mDistanceValueView.setText(
-                                ("" + (mDistanceValue + 0.000001f)).substring(0, 5)
-                        );
+                    }else {
+                        mDistanceValueView.setText(mPedometerSettings.getFormatDistance(mDistanceValue));
                     }
                     break;
                 case SPEED_MSG:

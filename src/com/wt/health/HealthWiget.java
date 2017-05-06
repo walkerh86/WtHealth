@@ -5,7 +5,9 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -27,15 +29,19 @@ public class HealthWiget extends AppWidgetProvider{
         return new ComponentName(context, HealthWiget.class);
     }
 	
-	private void performUpdate(Context context,AppWidgetManager appWidgetManager, int[] appWidgetIds,long[] changedEventIds) {            
+	public static  void performUpdate(Context context,AppWidgetManager appWidgetManager, int[] appWidgetIds,long[] changedEventIds) {            
 		Log.i(TAG, "performUpdate appWidgetIds="+appWidgetIds);
 		for (int appWidgetId : appWidgetIds) {
 			Log.i(TAG, "performUpdate appWidgetId="+appWidgetId);
 			RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.health_layout);
-			appWidgetManager.updateAppWidget(appWidgetId, views);
-			views.setTextViewText(R.id.steps_value, "0");
-			views.setTextViewText(R.id.distance_value, "0");
+			
+	        	PedometerSettings settings = PedometerSettings.getInstance(context);
+			int steps = Settings.System.getInt(context.getContentResolver(),"today_steps",0);
+			float distance = Settings.System.getFloat(context.getContentResolver(),"today_distance",0f);
+			views.setTextViewText(R.id.steps_value, String.valueOf(steps));
+			views.setTextViewText(R.id.distance_value, settings.getFormatDistance(distance));
 			views.setViewVisibility(R.id.control_stop, View.GONE);
+			
 			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}
 	}
@@ -57,7 +63,6 @@ public class HealthWiget extends AppWidgetProvider{
 	@Override  
     public void onEnabled(Context context) {  
         Log.d(TAG, "onEnabled");
-        //context.startService(EXAMPLE_SERVICE_INTENT);        
         super.onEnabled(context);  
     }  
 	
@@ -66,7 +71,6 @@ public class HealthWiget extends AppWidgetProvider{
     public void onDisabled(Context context) {  
         Log.d(TAG, "onDisabled");
         // 在最后一个 widget 被删除时，终止服务
-        //context.stopService(EXAMPLE_SERVICE_INTENT);
         super.onDisabled(context);  
     }
     

@@ -22,6 +22,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,9 +32,11 @@ import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -71,10 +74,19 @@ public class StepService extends Service {
     private NotificationManager mNM;
 
     private int mSteps;
-    private int mPace;
+    //private int mPace;
     private float mDistance;
-    private float mSpeed;
-    private float mCalories;
+    //private float mSpeed;
+    //private float mCalories;
+
+	private Handler mHandler = new Handler();
+	private Runnable mUpdateWidgetRunnable = new Runnable(){
+		@Override
+		public void run(){
+			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(StepService.this);
+			HealthWiget.performUpdate(StepService.this, appWidgetManager,appWidgetManager.getAppWidgetIds(new ComponentName(StepService.this, HealthWiget.class)),null);
+		}
+	};
     
     /**
      * Class for clients to access.  Because we know this service always
@@ -96,9 +108,9 @@ public class StepService extends Service {
         showNotification();
         
         // Load settings
-        mSettings = PreferenceManager.getDefaultSharedPreferences(this);
-        mPedometerSettings = new PedometerSettings(mSettings);
-        mState = getSharedPreferences("state", 0);
+        //mSettings = PreferenceManager.getDefaultSharedPreferences(this);
+        mPedometerSettings = PedometerSettings.getInstance(this);
+        //mState = getSharedPreferences("state", 0);
 
         mUtils = Utils.getInstance();
         mUtils.setService(this);
@@ -117,19 +129,19 @@ public class StepService extends Service {
         registerReceiver(mReceiver, filter);
 
         mStepDisplayer = new StepDisplayer(mPedometerSettings, mUtils);
-        mStepDisplayer.setSteps(mSteps = mState.getInt("steps", 0));
+        mStepDisplayer.setSteps(mSteps = mPedometerSettings.getTodaySteps());
         mStepDisplayer.addListener(mStepListener);
         mStepDetector.addStepListener(mStepDisplayer);
-
+/*
         mPaceNotifier     = new PaceNotifier(mPedometerSettings, mUtils);
         mPaceNotifier.setPace(mPace = mState.getInt("pace", 0));
         mPaceNotifier.addListener(mPaceListener);
         mStepDetector.addStepListener(mPaceNotifier);
-
+*/
         mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings, mUtils);
-        mDistanceNotifier.setDistance(mDistance = mState.getFloat("distance", 0));
+        mDistanceNotifier.setDistance(mDistance = mPedometerSettings.getTodayDistance());
         mStepDetector.addStepListener(mDistanceNotifier);
-        
+/*        
         mSpeedNotifier    = new SpeedNotifier(mSpeedListener,    mPedometerSettings, mUtils);
         mSpeedNotifier.setSpeed(mSpeed = mState.getFloat("speed", 0));
         mPaceNotifier.addListener(mSpeedNotifier);
@@ -145,7 +157,7 @@ public class StepService extends Service {
         mSpeakingTimer.addListener(mSpeedNotifier);
         mSpeakingTimer.addListener(mCaloriesNotifier);
         mStepDetector.addStepListener(mSpeakingTimer);
-        
+*/        
         // Used when debugging:
         // mStepBuzzer = new StepBuzzer(this);
         // mStepDetector.addStepListener(mStepBuzzer);
@@ -163,19 +175,20 @@ public class StepService extends Service {
     @Override
     public void onDestroy() {
         Log.i(TAG, "[SERVICE] onDestroy");
-        mUtils.shutdownTTS();
+        //mUtils.shutdownTTS();
 
         // Unregister our receiver.
         unregisterReceiver(mReceiver);
         unregisterDetector();
-        
+        /*
         mStateEditor = mState.edit();
         mStateEditor.putInt("steps", mSteps);
         mStateEditor.putInt("pace", mPace);
         mStateEditor.putFloat("distance", mDistance);
         mStateEditor.putFloat("speed", mSpeed);
         mStateEditor.putFloat("calories", mCalories);
-        mStateEditor.commit();
+        mStateEditor.commit();*/
+        mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
         
         mNM.cancel(R.string.app_name);
 
@@ -255,11 +268,11 @@ public class StepService extends Service {
     }
     
     public void reloadSettings() {
-        mSettings = PreferenceManager.getDefaultSharedPreferences(this);
+        //mSettings = PreferenceManager.getDefaultSharedPreferences(this);
         
         if (mStepDetector != null) { 
             mStepDetector.setSensitivity(
-                    Float.valueOf(mSettings.getString("sensitivity", "10"))
+                    Float.valueOf(mPedometerSettings.getSensitivity())
             );
         }
         
@@ -285,17 +298,17 @@ public class StepService extends Service {
     private StepDisplayer.Listener mStepListener = new StepDisplayer.Listener() {
         public void stepsChanged(int value) {
             mSteps = value;
+	     saveSteps();
             passValue();
         }
         public void passValue() {
             if (mCallback != null) {
                 mCallback.stepsChanged(mSteps);
             }
+	     mHandler.post(mUpdateWidgetRunnable);
         }
     };
-    /**
-     * Forwards pace values from PaceNotifier to the activity. 
-     */
+    /*
     private PaceNotifier.Listener mPaceListener = new PaceNotifier.Listener() {
         public void paceChanged(int value) {
             mPace = value;
@@ -307,12 +320,11 @@ public class StepService extends Service {
             }
         }
     };
-    /**
-     * Forwards distance values from DistanceNotifier to the activity. 
-     */
+    */
     private DistanceNotifier.Listener mDistanceListener = new DistanceNotifier.Listener() {
         public void valueChanged(float value) {
             mDistance = value;
+	     saveDistance();
             passValue();
         }
         public void passValue() {
@@ -321,9 +333,7 @@ public class StepService extends Service {
             }
         }
     };
-    /**
-     * Forwards speed values from SpeedNotifier to the activity. 
-     */
+    /*
     private SpeedNotifier.Listener mSpeedListener = new SpeedNotifier.Listener() {
         public void valueChanged(float value) {
             mSpeed = value;
@@ -335,9 +345,7 @@ public class StepService extends Service {
             }
         }
     };
-    /**
-     * Forwards calories values from CaloriesNotifier to the activity. 
-     */
+    
     private CaloriesNotifier.Listener mCaloriesListener = new CaloriesNotifier.Listener() {
         public void valueChanged(float value) {
             mCalories = value;
@@ -349,6 +357,7 @@ public class StepService extends Service {
             }
         }
     };
+    */
     
     /**
      * Show a notification while this service is running.
@@ -405,5 +414,12 @@ public class StepService extends Service {
         wakeLock.acquire();
     }
 
+    private void saveSteps(){
+		Settings.System.putInt(this.getContentResolver(),"today_steps",mSteps);
+    }
+
+    private void saveDistance(){
+		Settings.System.putFloat(this.getContentResolver(),"today_distance",mDistance);
+    }
 }
 

@@ -84,4 +84,5 @@
             <Button android:textSize="24.0sp" android:id="@+id/control_stop" android:background="@drawable/button_stop" android:padding="3.0dip" android:visibility="visible" android:layout_width="60.0dip" android:layout_height="60.0dip" android:layout_marginLeft="10.0dip" />
             <Button android:textSize="24.0sp" android:id="@+id/control_restart" android:background="@drawable/button_restart" android:padding="3.0dip" android:visibility="gone" android:layout_width="60.0dip" android:layout_height="60.0dip" android:layout_marginLeft="10.0dip" />
         </LinearLayout>
+       
 </RelativeLayout>

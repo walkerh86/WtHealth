@@ -58,13 +58,11 @@
                 <action android:name="com.wt.health.action.ExtStepService"/>
             </intent-filter>
         </service>
-        <!--  
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        -->
         <service android:name=".PedometerDataService"/>
         <service android:name=".ScreenSensorService">
             <intent-filter/>
