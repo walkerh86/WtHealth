@@ -101,4 +101,8 @@
     <string name="hours">" h "</string>
     <string name="interval_time">Interval time</string>
     <string name="unit_km">km</string>
+    <string name="no_history_data">None steps</string>
+    <string name="sensor_x">"X:"</string>
+    <string name="sensor_y">"Y:"</string>
+    <string name="sensor_z">"Z:"</string>
 </resources>

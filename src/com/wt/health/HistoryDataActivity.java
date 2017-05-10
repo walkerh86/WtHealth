@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 public class HistoryDataActivity extends Activity{
 	private Cursor mCursor;
+	private View mEmptyView;
 	
 	public void onCreate(Bundle bundle){
 		super.onCreate(bundle);
@@ -27,6 +28,8 @@ public class HistoryDataActivity extends Activity{
 				new String[]{"date","steps","diatance"},
 				new int[]{R.id.date,R.id.steps,R.id.distance});
 		listView.setAdapter(adapter);
+		mEmptyView = findViewById(R.id.empty_view);
+		listView.setEmptyView(mEmptyView);
 	}
 	
 	protected void onDestroy() {

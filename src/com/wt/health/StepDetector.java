@@ -45,6 +45,7 @@ public class StepDetector implements SensorEventListener
     private float   mLastDiff[] = new float[3*2];
     private int     mLastMatch = -1;
     private long mLastStepTimeMillis;
+	private long mLastDiffTimeMillis;
     
     private ArrayList<StepListener> mStepListeners = new ArrayList<StepListener>();
     
@@ -68,13 +69,9 @@ public class StepDetector implements SensorEventListener
     public void onSensorChanged(SensorEvent event) {
         Sensor sensor = event.sensor; 
         synchronized (this) {
-            if (sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            	android.util.Log.i(TAG, "onSensorChanged TYPE_ORIENTATION");
-            }else {
                 if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 	detectStepByAccMethod1(event);
                 }
-            }
         }
     }
     
@@ -103,23 +100,20 @@ public class StepDetector implements SensorEventListener
             int extType = (direction > 0 ? 0 : 1); // minumum or maximum?
             mLastExtremes[extType][k] = mLastValues[k];
             float diff = Math.abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
-
             if (diff > mLimit) {
-                
+	     	  //Log.i("hcjStep","diff="+diff+",diff_gaptime="+(SystemClock.uptimeMillis()-mLastDiffTimeMillis));
+		  mLastDiffTimeMillis = SystemClock.uptimeMillis();
                 boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff[k]*2/3);
                 boolean isPreviousLargeEnough = mLastDiff[k] > (diff/3);
                 boolean isNotContra = (mLastMatch != 1 - extType);
-                boolean isTimeEnough = false;
-                long timeMillis = SystemClock.uptimeMillis();
-                if(timeMillis - mLastStepTimeMillis > 200){
-                	isTimeEnough = true;
-                }
                 
-                if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra && isTimeEnough) {
-                    //Log.i(TAG, "step");
-                    notifyStep();
-                    mLastMatch = extType;
-                    mLastStepTimeMillis = timeMillis;
+                if (isAlmostAsLargeAsPrevious && isPreviousLargeEnough && isNotContra) {
+	                long timeMillis = SystemClock.uptimeMillis();
+	                if(timeMillis - mLastStepTimeMillis > 300){
+	                    notifyStep();
+	                    mLastMatch = extType;
+	                    mLastStepTimeMillis = timeMillis;
+	                }
                 }
                 else {
                     mLastMatch = -1;

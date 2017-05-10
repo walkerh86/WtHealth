@@ -10,14 +10,19 @@
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
         android:layout_marginTop="10.0dip">
+        <!-- 
         <TextView 
             android:textSize="38.0sp" 
             android:textColor="@color/orange" 
             android:id="@+id/month" 
             android:layout_width="wrap_content" 
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" /> -->
         <include
             layout="@layout/head_view" />
+        <FrameLayout
+            android:layout_width="match_parent" 
+            android:layout_height="320.0dip" 
+            >
         <ListView 
             android:id="@+id/data_list" 
             android:padding="5.0dip" 
@@ -29,5 +34,14 @@
             android:layout_marginRight="15.0dip" 
             android:layout_marginBottom="0.0dip" 
             android:divider="@null" />
+        <TextView 
+            android:id="@+id/empty_view"
+            android:textSize="32sp"
+            android:textColor="#ff000000"
+            android:text="@string/no_history_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+        </FrameLayout>
     </LinearLayout>
 </ScrollView>
