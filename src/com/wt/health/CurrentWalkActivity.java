@@ -39,9 +39,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class CurrentWalkActivity extends Activity {
-	private static final String TAG = "hcj.CurrentWalkActivity";
+	private static final String TAG = "hcj.StepsLife";
     private PedometerSettings mPedometerSettings;
-    private Utils mUtils;
+    //private Utils mUtils;
     
     private TextView mStepValueView;
     private TextView mPaceValueView;
@@ -59,10 +59,12 @@ public class CurrentWalkActivity extends Activity {
     private boolean mIsMetric;
     private float mMaintainInc;
     private boolean mQuitting = false; // Set when user selected Quit from menu, can be used by onPause, onStop, onDestroy
-    
+/*
     private Button mStartBtn;
     private Button mStopBtn;
     private Button mRestartBtn;
+*/
+	private TextView mBtnControl;
     
     /**
      * True, when service is running.
@@ -74,7 +76,9 @@ public class CurrentWalkActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "[ACTIVITY] onCreate");
         super.onCreate(savedInstanceState);
-        
+		
+	 mPedometerSettings = PedometerSettings.getInstance(this);
+	 
         mStepValue = 0;
         mPaceValue = 0;
         
@@ -88,48 +92,65 @@ public class CurrentWalkActivity extends Activity {
         //mDesiredPaceView   = (TextView) findViewById(R.id.desired_pace_value);
         mStepValueView.setText("0");
         mDistanceValueView.setText("0");
-        
+    /*
         mStartBtn = (Button)findViewById(R.id.control_start);
         mStartBtn.setOnClickListener(mOnClickListener);
         mStopBtn = (Button)findViewById(R.id.control_stop);
         mStopBtn.setOnClickListener(mOnClickListener);
         mRestartBtn = (Button)findViewById(R.id.control_restart);
         mRestartBtn.setOnClickListener(mOnClickListener);
-
+*/
+	 mBtnControl = (TextView)findViewById(R.id.btn_control);
+	 mBtnControl.setOnClickListener(mOnClickListener);
+	 updateBtn();
+	 
 	 View btnHistory = findViewById(R.id.btn_history);
 	 btnHistory.setOnClickListener(mOnClickListener);
         
-        mUtils = Utils.getInstance();
-	 mPedometerSettings = PedometerSettings.getInstance(this);
+        //mUtils = Utils.getInstance();
+	 /*
 	 if(mPedometerSettings.isPedometerStart()){
 	 	startPedometer();
-	 }
+	 }*/
+	 startStepService();
+	 bindStepService();
     }
 
 	private void startPedometer(){
-		startStepService();
-	 	bindStepService();
+		//startStepService();
+	 	//bindStepService();
+	 	mPedometerSettings.setPedometerState(true);
+	 	if(mService != null){
+			mService.startPedometer();
+	 	}
 	}
 
 	private void stopPedometer(){
-		unbindStepService();
-		stopStepService();
+		//unbindStepService();
+		//stopStepService();
+		mPedometerSettings.setPedometerState(false);
+	 	if(mService != null){
+			mService.stopPedometer();
+	 	}
 	}
     
     private void updateBtn(){
+	/*	
     	if(mPedometerSettings.isPedometerStart()){
     		mStopBtn.setVisibility(View.VISIBLE);
     		mStartBtn.setVisibility(View.GONE);
     	}else{
     		mStopBtn.setVisibility(View.GONE);
     		mStartBtn.setVisibility(View.VISIBLE);
-    	}
+    	}*/
+    		mBtnControl.setText(mPedometerSettings.isPedometerStart() ? R.string.stop : R.string.start);
     }
     
     private View.OnClickListener mOnClickListener = new View.OnClickListener(){
     	@Override
     	public void onClick(View view){
     		int id = view.getId();
+		/*	
     		if(id == R.id.control_start){
     			startPedometer();
 			updateBtn();
@@ -138,6 +159,11 @@ public class CurrentWalkActivity extends Activity {
 			updateBtn();
     		}else if(id == R.id.btn_history){
     			startHistoryActivity();
+    		}*/
+    		if(id == R.id.btn_history){
+    			startHistoryActivity();
+    		}else if(id == R.id.btn_control){
+    			togglePedometerState();
     		}
     	}
     };
@@ -191,6 +217,15 @@ public class CurrentWalkActivity extends Activity {
         super.onDestroy();
     }
 
+	private void togglePedometerState(){
+		if(mPedometerSettings.isPedometerStart()){
+			stopPedometer();
+		}else{
+			startPedometer();
+		}
+		updateBtn();
+	}
+
     private void savePaceSetting() {
         mPedometerSettings.savePaceOrSpeedSetting(mMaintain, mDesiredPaceOrSpeed);
     }
@@ -208,6 +243,7 @@ public class CurrentWalkActivity extends Activity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
+	     android.util.Log.i(TAG, "onServiceDisconnected");
             mService = null;
         }
     };

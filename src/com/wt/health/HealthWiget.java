@@ -40,7 +40,8 @@ public class HealthWiget extends AppWidgetProvider{
 			float distance = Settings.System.getFloat(context.getContentResolver(),"today_distance",0f);
 			views.setTextViewText(R.id.steps_value, String.valueOf(steps));
 			views.setTextViewText(R.id.distance_value, settings.getFormatDistance(distance));
-			views.setViewVisibility(R.id.control_stop, View.GONE);
+			views.setViewVisibility(R.id.btn_history, View.GONE);
+			views.setViewVisibility(R.id.btn_control, View.GONE);
 			
 			appWidgetManager.updateAppWidget(appWidgetId, views);
 		}

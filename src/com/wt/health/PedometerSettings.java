@@ -183,12 +183,12 @@ public class PedometerSettings {
     }
     
     public void startPedometerService(Context context){
-	setPedometerState(true);
+	//setPedometerState(true);
     	context.startService(new Intent(context,StepService.class));                
     }
 	
     public void stopPedometerService(Context context){
-	setPedometerState(false);
+	//setPedometerState(false);
     	context.stopService(new Intent(context,StepService.class));                
     }
 
@@ -219,4 +219,14 @@ public class PedometerSettings {
     public String getSensitivity(){
 	return mSettings.getString("sensitivity", "10");
     }
+
+	public String getTodayTime(){
+		return mSettings.getString("today_time",null);
+	}
+
+	public void setTodayTime(String time){
+		SharedPreferences.Editor editor = mSettings.edit();
+		editor.putString("today_time", time);
+		editor.commit();
+	}
 }

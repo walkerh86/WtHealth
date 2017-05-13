@@ -24,19 +24,14 @@ import java.util.ArrayList;
  * Counts steps provided by StepDetector and passes the current
  * step count to the activity.
  */
-public class StepDisplayer implements StepListener, SpeakingTimer.Listener {
+public class StepDisplayer implements StepListener{
 
     private int mCount = 0;
     PedometerSettings mSettings;
-    Utils mUtils;
 
-    public StepDisplayer(PedometerSettings settings, Utils utils) {
-        mUtils = utils;
+    public StepDisplayer(PedometerSettings settings) {
         mSettings = settings;
         notifyListener();
-    }
-    public void setUtils(Utils utils) {
-        mUtils = utils;
     }
 
     public void setSteps(int steps) {
@@ -72,17 +67,4 @@ public class StepDisplayer implements StepListener, SpeakingTimer.Listener {
             listener.stepsChanged((int)mCount);
         }
     }
-    
-    //-----------------------------------------------------
-    // Speaking
-    
-    public void speak() {
-        if (mSettings.shouldTellSteps()) { 
-            if (mCount > 0) {
-                mUtils.say("" + mCount + " steps");
-            }
-        }
-    }
-    
-    
 }

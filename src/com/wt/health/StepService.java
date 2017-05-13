@@ -48,22 +48,10 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-
-/**
- * This is an example of implementing an application service that runs locally
- * in the same process as the application.  The {@link StepServiceController}
- * and {@link StepServiceBinding} classes show how to interact with the
- * service.
- *
- * <p>Notice the use of the {@link NotificationManager} when interesting things
- * happen in the service.  This is generally how background services should
- * interact with the user, rather than doing something more disruptive such as
- * calling startActivity().
- */
 public class StepService extends Service {
-	private static final String TAG = "hcj.StepService";
+	private static final String TAG = "hcj.StepsLife";
     private PedometerSettings mPedometerSettings;
-    private Utils mUtils;
+    //private Utils mUtils;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private StepDetector mStepDetector;
@@ -71,11 +59,12 @@ public class StepService extends Service {
     private StepDisplayer mStepDisplayer;
     private DistanceNotifier mDistanceNotifier;
     
-    private PowerManager.WakeLock wakeLock;
-    private NotificationManager mNM;
+    private PowerManager.WakeLock mWakeLock;
+    //private NotificationManager mNM;
 
     private int mSteps;
     private float mDistance;
+	private boolean mPedometerStart;
 
 	private static final SimpleDateFormat mDateSdf = new SimpleDateFormat("yyyy-MM-dd");
 	private Handler mHandler = new Handler();
@@ -91,20 +80,24 @@ public class StepService extends Service {
 		@Override
 		public void run(){
 			String date = getCurrentDate();
-			Log.i(TAG,"mDateChangeRunnable date="+date);
-			final ContentResolver cr = StepService.this.getContentResolver();
-			Cursor cursor = cr.query(StepHealth.CONTENT_URI, StepHealth.ALL_PROJECTION, "date=?", new String[] { date }, null);
-			if ((cursor != null) && (cursor.getCount() > 0)){
-				ContentValues values = new ContentValues();
-				values.put("steps", Integer.valueOf(mSteps));
-				cursor.close();
-				cr.update(StepHealth.CONTENT_URI, values, "date=?", new String[] { date });
-				return;
-			}
-			insert(cr, date);
-			resetValues();
+			onDateChanged(date);
 		}
 	};
+
+	private void onDateChanged(String date){
+		Log.i(TAG,"onDateChanged date="+date);
+		final ContentResolver cr = StepService.this.getContentResolver();
+		Cursor cursor = cr.query(StepHealth.CONTENT_URI, StepHealth.ALL_PROJECTION, "date=?", new String[] { date }, null);
+		if ((cursor != null) && (cursor.getCount() > 0)){
+			ContentValues values = new ContentValues();
+			values.put("steps", Integer.valueOf(mSteps));
+			cursor.close();
+			cr.update(StepHealth.CONTENT_URI, values, "date=?", new String[] { date });
+			return;
+		}
+		insert(cr, date);
+		resetValues();
+	}
     
     /**
      * Class for clients to access.  Because we know this service always
@@ -122,31 +115,44 @@ public class StepService extends Service {
         Log.i(TAG, "[SERVICE] onCreate");
         super.onCreate();
         
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        showNotification();
-        
         mPedometerSettings = PedometerSettings.getInstance(this);
-
-        mUtils = Utils.getInstance();
-        mUtils.setService(this);
-
-        acquireWakeLock();
+        //acquireWakeLock();
         
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
         // Start detecting
         mStepDetector = new StepDetector();
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        registerDetector();
+        //registerDetector();
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction("android.intent.action.DATE_CHANGED");
         registerReceiver(mReceiver, filter);
 
-        mStepDisplayer = new StepDisplayer(mPedometerSettings, mUtils);
+	 String prevTodayTime = mPedometerSettings.getTodayTime();
+	 String currTodayTime = getCurrentDate();
+	 if (!currTodayTime.equals(prevTodayTime)) {
+	 	mPedometerSettings.setTodayTime(currTodayTime);
+		if(prevTodayTime != null){
+			//save preiview day steps
+			onDateChanged(prevTodayTime);
+		}else{
+			//first time step
+		}
+	 }
+
+	 mPedometerStart = false;
+	 if(mPedometerSettings.isPedometerStart()){
+	 	startPedometer();
+	 }
+
+        mStepDisplayer = new StepDisplayer(mPedometerSettings);
         mStepDisplayer.setSteps(mSteps = mPedometerSettings.getTodaySteps());
         mStepDisplayer.addListener(mStepListener);
         mStepDetector.addStepListener(mStepDisplayer);
 
-        mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings, mUtils);
+        mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings);
         mDistanceNotifier.setDistance(mDistance = mPedometerSettings.getTodayDistance());
         mStepDetector.addStepListener(mDistanceNotifier);
 
@@ -159,28 +165,33 @@ public class StepService extends Service {
         super.onStart(intent, startId);
     }
 
+	@Override  
+	public int onStartCommand(Intent intent, int flags, int startId) {  
+		super.onStartCommand(intent,flags,startId);
+		return START_STICKY;  
+	}   
+	
     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.i(TAG, "[SERVICE] onDestroy");
-        //mUtils.shutdownTTS();
 
         // Unregister our receiver.
         unregisterReceiver(mReceiver);
-        unregisterDetector();
+        //unregisterDetector();
+        stopPedometer();
 		
         mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
-        
-        mNM.cancel(R.string.app_name);
 
-        wakeLock.release();
-        
-        super.onDestroy();
-        
-        // Stop detecting
-        mSensorManager.unregisterListener(mStepDetector);
+        //wakeLock.release();
     }
 
     private void registerDetector() {
+	 if(mPedometerStart){
+	 	Log.i(TAG,"registerDetector already registered");
+	 	return;
+	 }
+	 mPedometerStart = true;
         mSensor = mSensorManager.getDefaultSensor(
             Sensor.TYPE_ACCELEROMETER /*| 
             Sensor.TYPE_MAGNETIC_FIELD | 
@@ -191,6 +202,11 @@ public class StepService extends Service {
     }
 
     private void unregisterDetector() {
+	 if(!mPedometerStart){
+	 	Log.i(TAG,"registerDetector already unregistered");
+	 	return;
+	 }
+	 mPedometerStart = false;
         mSensorManager.unregisterListener(mStepDetector);
     }
 
@@ -217,13 +233,13 @@ public class StepService extends Service {
 
     public void registerCallback(ICallback cb) {
         mCallback = cb;
+	 mCallback.stepsChanged(mSteps);
+	 mCallback.distanceChanged(mDistance);
         //mStepDisplayer.passValue();
         //mPaceListener.passValue();
     }
         
     public void reloadSettings() {
-        //mSettings = PreferenceManager.getDefaultSharedPreferences(this);
-        
         if (mStepDetector != null) { 
             mStepDetector.setSensitivity(
                     Float.valueOf(mPedometerSettings.getSensitivity())
@@ -233,10 +249,24 @@ public class StepService extends Service {
         if (mStepDisplayer    != null) mStepDisplayer.reloadSettings();
         if (mDistanceNotifier != null) mDistanceNotifier.reloadSettings();
     }
+
+	public void startPedometer(){
+		registerDetector();
+		mWakeLock.acquire();
+	}
+
+	public void stopPedometer(){
+		unregisterDetector();
+		mWakeLock.release();
+
+		mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
+	}
     
     public void resetValues() {
         mStepDisplayer.setSteps(mSteps = 0);
         mDistanceNotifier.setDistance(mDistance = 0f);
+		
+	 mPedometerSettings.setTodayStepDistance(0, 0f);
     }
     
     /**
@@ -255,19 +285,7 @@ public class StepService extends Service {
 	     mHandler.post(mUpdateWidgetRunnable);
         }
     };
-    /*
-    private PaceNotifier.Listener mPaceListener = new PaceNotifier.Listener() {
-        public void paceChanged(int value) {
-            mPace = value;
-            passValue();
-        }
-        public void passValue() {
-            if (mCallback != null) {
-                mCallback.paceChanged(mPace);
-            }
-        }
-    };
-    */
+	
     private DistanceNotifier.Listener mDistanceListener = new DistanceNotifier.Listener() {
         public void valueChanged(float value) {
             mDistance = value;
@@ -280,31 +298,6 @@ public class StepService extends Service {
             }
         }
     };
-    /*
-    private SpeedNotifier.Listener mSpeedListener = new SpeedNotifier.Listener() {
-        public void valueChanged(float value) {
-            mSpeed = value;
-            passValue();
-        }
-        public void passValue() {
-            if (mCallback != null) {
-                mCallback.speedChanged(mSpeed);
-            }
-        }
-    };
-    
-    private CaloriesNotifier.Listener mCaloriesListener = new CaloriesNotifier.Listener() {
-        public void valueChanged(float value) {
-            mCalories = value;
-            passValue();
-        }
-        public void passValue() {
-            if (mCallback != null) {
-                mCallback.caloriesChanged(mCalories);
-            }
-        }
-    };
-    */
     
     /**
      * Show a notification while this service is running.
@@ -334,19 +327,21 @@ public class StepService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+		  mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
                 // Unregisters the listener and registers it again.
                 StepService.this.unregisterDetector();
                 StepService.this.registerDetector();
+		/*		
                 if (mPedometerSettings.wakeAggressively()) {
-                    wakeLock.release();
-                    acquireWakeLock();
-                }
+                    //wakeLock.release();
+                    //acquireWakeLock();
+                }*/
             }else if("android.intent.action.DATE_CHANGED".equals(action)){
             	  mHandler.post(mDateChangeRunnable);
             }
         }
     };
-
+/*
     private void acquireWakeLock() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         int wakeFlags;
@@ -362,7 +357,7 @@ public class StepService extends Service {
         wakeLock = pm.newWakeLock(wakeFlags, TAG);
         wakeLock.acquire();
     }
-
+*/
     private void saveSteps(){
         Settings.System.putInt(this.getContentResolver(),"today_steps",mSteps);
     }
