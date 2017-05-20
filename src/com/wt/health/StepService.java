@@ -90,7 +90,8 @@ public class StepService extends Service {
 		Cursor cursor = cr.query(StepHealth.CONTENT_URI, StepHealth.ALL_PROJECTION, "date=?", new String[] { date }, null);
 		if ((cursor != null) && (cursor.getCount() > 0)){
 			ContentValues values = new ContentValues();
-			values.put("steps", Integer.valueOf(mSteps));
+			values.put("steps", mSteps);
+			values.put("diatance", mDistance);
 			cursor.close();
 			cr.update(StepHealth.CONTENT_URI, values, "date=?", new String[] { date });
 			return;
@@ -126,6 +127,15 @@ public class StepService extends Service {
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         //registerDetector();
 
+        mStepDisplayer = new StepDisplayer(mPedometerSettings);
+        mStepDisplayer.setSteps(mSteps = mPedometerSettings.getTodaySteps());
+        mStepDisplayer.addListener(mStepListener);
+        mStepDetector.addStepListener(mStepDisplayer);
+
+        mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings);
+        mDistanceNotifier.setDistance(mDistance = mPedometerSettings.getTodayDistance());
+        mStepDetector.addStepListener(mDistanceNotifier);
+
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction("android.intent.action.DATE_CHANGED");
         registerReceiver(mReceiver, filter);
@@ -146,16 +156,7 @@ public class StepService extends Service {
 	 if(mPedometerSettings.isPedometerStart()){
 	 	startPedometer();
 	 }
-
-        mStepDisplayer = new StepDisplayer(mPedometerSettings);
-        mStepDisplayer.setSteps(mSteps = mPedometerSettings.getTodaySteps());
-        mStepDisplayer.addListener(mStepListener);
-        mStepDetector.addStepListener(mStepDisplayer);
-
-        mDistanceNotifier = new DistanceNotifier(mDistanceListener, mPedometerSettings);
-        mDistanceNotifier.setDistance(mDistance = mPedometerSettings.getTodayDistance());
-        mStepDetector.addStepListener(mDistanceNotifier);
-
+	 
         reloadSettings();
     }
     
@@ -263,6 +264,9 @@ public class StepService extends Service {
 	}
     
     public void resetValues() {
+	 if(mStepDisplayer == null || mDistanceNotifier == null || mPedometerSettings == null){
+	 	return;
+	 }
         mStepDisplayer.setSteps(mSteps = 0);
         mDistanceNotifier.setDistance(mDistance = 0f);
 		
@@ -382,6 +386,10 @@ public class StepService extends Service {
 		values.put("steps", mSteps);
 		values.put("diatance", mDistance);
 		cr.insert(StepHealth.CONTENT_URI, values);
+	}
+
+	public void saveStepsAndDistance(){
+		mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
 	}
 }
 

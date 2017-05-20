@@ -180,6 +180,7 @@ public class CurrentWalkActivity extends Activity {
         super.onResume();
 		
         //if(mPedometerSettings.isPedometerStart()){
+        	savePaceSetting();
         	mStepValueView.setText(String.valueOf(mPedometerSettings.getTodaySteps()));
         	mDistanceValueView.setText(mPedometerSettings.getFormatDistance());
         //}
@@ -197,7 +198,6 @@ public class CurrentWalkActivity extends Activity {
         mPedometerSettings.setPedometerState(mIsRunning);
 */
         super.onPause();
-        savePaceSetting();
     }
 
     @Override
@@ -227,7 +227,9 @@ public class CurrentWalkActivity extends Activity {
 	}
 
     private void savePaceSetting() {
-        mPedometerSettings.savePaceOrSpeedSetting(mMaintain, mDesiredPaceOrSpeed);
+        if(mService != null){
+		mService.saveStepsAndDistance();
+        }
     }
 
     private StepService mService;
