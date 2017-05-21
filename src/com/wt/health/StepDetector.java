@@ -102,7 +102,7 @@ public class StepDetector implements SensorEventListener
             float diff = Math.abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
             if (diff > mLimit) {
 	     	  //Log.i("hcjStep","diff="+diff+",diff_gaptime="+(SystemClock.uptimeMillis()-mLastDiffTimeMillis));
-		  mLastDiffTimeMillis = SystemClock.uptimeMillis();
+            	//mLastDiffTimeMillis = SystemClock.uptimeMillis();
                 boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff[k]*2/3);
                 boolean isPreviousLargeEnough = mLastDiff[k] > (diff/3);
                 boolean isNotContra = (mLastMatch != 1 - extType);
@@ -113,6 +113,8 @@ public class StepDetector implements SensorEventListener
 	                    notifyStep();
 	                    mLastMatch = extType;
 	                    mLastStepTimeMillis = timeMillis;
+	                }else{
+	                	mLastMatch = -1;
 	                }
                 }
                 else {

@@ -205,7 +205,7 @@ public class PedometerSettings {
 	return String.format(DISTANCE_FORMAT_STR,distance);
     }
 
-    public String getFormatDistance(float distance){
+    public static String getFormatDistance(float distance){
 	return String.format(DISTANCE_FORMAT_STR,distance);
     }
 

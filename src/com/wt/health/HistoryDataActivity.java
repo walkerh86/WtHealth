@@ -24,10 +24,12 @@ public class HistoryDataActivity extends Activity{
 		mCursor = this.getContentResolver().query(StepHealth.CONTENT_URI, StepHealth.ALL_PROJECTION, 
 				null, null, null);
 		ListView listView = (ListView)findViewById(R.id.data_list);
+		/*
 		SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,R.layout.item_layout,mCursor,
 				new String[]{"date","steps","diatance"},
 				new int[]{R.id.date,R.id.steps,R.id.distance});
-		listView.setAdapter(adapter);
+		*/
+		listView.setAdapter(new MyCursorAdapter(this,mCursor));
 		mEmptyView = findViewById(R.id.empty_view);
 		listView.setEmptyView(mEmptyView);
 	}
@@ -54,6 +56,7 @@ public class HistoryDataActivity extends Activity{
 			holder.mDateView = (TextView)view.findViewById(R.id.date);
 			holder.mStepView = (TextView)view.findViewById(R.id.steps);
 			holder.mDistanceView = (TextView)view.findViewById(R.id.distance);
+			holder.mSectionView = (TextView)view.findViewById(R.id.section_date);
 			view.setTag(holder);
 			return view;
 		}
@@ -61,6 +64,24 @@ public class HistoryDataActivity extends Activity{
 		@Override  
 	    public void bindView(View view, Context context, Cursor cursor) {
 			ViewHolder holder = (ViewHolder)view.getTag();
+			//cursor.get
+			String date = cursor.getString(1);
+			holder.mDateView.setText(date.substring(8));
+			holder.mStepView.setText(cursor.getString(2));
+			holder.mDistanceView.setText(PedometerSettings.getFormatDistance(cursor.getFloat(3)));
+			boolean showSection = true;
+			if(cursor.moveToPrevious()){
+				String prevDate = cursor.getString(1);
+				if(date.regionMatches(0, prevDate, 0, 7)){
+					showSection = false;
+				}
+			}
+			if(showSection){
+				holder.mSectionView.setText(date.subSequence(0, 7));
+				holder.mSectionView.setVisibility(View.VISIBLE);
+			}else{
+				holder.mSectionView.setVisibility(View.GONE);
+			}
 		}
 	}
 	
@@ -68,5 +89,6 @@ public class HistoryDataActivity extends Activity{
 		public TextView mDateView;
 		public TextView mStepView;
 		public TextView mDistanceView;
+		public TextView mSectionView;
 	}
 }
