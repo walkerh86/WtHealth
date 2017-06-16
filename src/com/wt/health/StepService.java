@@ -73,6 +73,8 @@ public class StepService extends Service {
 		public void run(){
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(StepService.this);
 			HealthWiget.performUpdate(StepService.this, appWidgetManager,appWidgetManager.getAppWidgetIds(new ComponentName(StepService.this, HealthWiget.class)),null);
+
+			saveSteps();//for clock
 		}
 	};
 	
@@ -279,7 +281,6 @@ public class StepService extends Service {
     private StepDisplayer.Listener mStepListener = new StepDisplayer.Listener() {
         public void stepsChanged(int value) {
             mSteps = value;
-	     saveSteps();
             passValue();
         }
         public void passValue() {

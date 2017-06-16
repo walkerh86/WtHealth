@@ -100,7 +100,7 @@ public class StepDetector implements SensorEventListener
             int extType = (direction > 0 ? 0 : 1); // minumum or maximum?
             mLastExtremes[extType][k] = mLastValues[k];
             float diff = Math.abs(mLastExtremes[extType][k] - mLastExtremes[1 - extType][k]);
-            if (diff > mLimit) {
+            if (diff > 4.44/*mLimit*/) {
 	     	  //Log.i("hcjStep","diff="+diff+",diff_gaptime="+(SystemClock.uptimeMillis()-mLastDiffTimeMillis));
             	//mLastDiffTimeMillis = SystemClock.uptimeMillis();
                 boolean isAlmostAsLargeAsPrevious = diff > (mLastDiff[k]*2/3);
