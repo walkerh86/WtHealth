@@ -112,6 +112,9 @@ public class CaloriesNotifier implements StepListener, SpeakingTimer.Listener {
         
     }
     
+	@Override
+	public void onStepValue(int value) {
+	}   
 
 }
 

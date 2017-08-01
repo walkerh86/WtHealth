@@ -26,5 +26,6 @@ package com.wt.health;
 public interface StepListener {
     public void onStep();
     public void passValue();
+    public void onStepValue(int value);
 }
 

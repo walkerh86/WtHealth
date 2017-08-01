@@ -1,4 +1,6 @@
 *.rar
 /gen
 /bin
+/obj
+/libs/armeabi
 commit_log.txt

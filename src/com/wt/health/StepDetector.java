@@ -71,12 +71,21 @@ public class StepDetector implements SensorEventListener
         synchronized (this) {
                 if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 	detectStepByAccMethod1(event);
+                }else if(sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+                	int value = (int)event.values[0];
+                	notifyStepValue(value);
                 }
         }
     }
     
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // TODO Auto-generated method stub
+    }
+    
+    private void notifyStepValue(int value){
+    	for (StepListener stepListener : mStepListeners) {
+            stepListener.onStepValue(value);
+        }
     }
     
     private void notifyStep(){

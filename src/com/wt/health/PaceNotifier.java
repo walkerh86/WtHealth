@@ -174,6 +174,9 @@ public class PaceNotifier implements StepListener, SpeakingTimer.Listener {
         }
     }
     
-
+	@Override
+	public void onStepValue(int value) {
+	}
+    
 }
 

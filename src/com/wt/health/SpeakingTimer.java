@@ -83,5 +83,11 @@ public class SpeakingTimer implements StepListener {
     public boolean isSpeaking() {
         return mUtils.isSpeakingNow();
     }
+    
+	@Override
+	public void onStepValue(int value) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

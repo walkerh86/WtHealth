@@ -123,6 +123,8 @@ public class CurrentWalkActivity extends Activity {
 	 	if(mService != null){
 			mService.startPedometer();
 	 	}
+	 	
+	 	StepDevice.getInstance().sendCmd(StepDevice.CMD_ENABLE_STEP, 0);
 	}
 
 	private void stopPedometer(){
@@ -132,6 +134,8 @@ public class CurrentWalkActivity extends Activity {
 	 	if(mService != null){
 			mService.stopPedometer();
 	 	}
+	 	
+	 	StepDevice.getInstance().sendCmd(StepDevice.CMD_DISABLE_STEP, 0);
 	}
     
     private void updateBtn(){

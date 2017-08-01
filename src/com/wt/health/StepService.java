@@ -59,7 +59,7 @@ public class StepService extends Service {
     private StepDisplayer mStepDisplayer;
     private DistanceNotifier mDistanceNotifier;
     
-    private PowerManager.WakeLock mWakeLock;
+    //private PowerManager.WakeLock mWakeLock;
     //private NotificationManager mNM;
 
     private int mSteps;
@@ -122,7 +122,7 @@ public class StepService extends Service {
         //acquireWakeLock();
         
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        //mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
         // Start detecting
         mStepDetector = new StepDetector();
@@ -196,7 +196,8 @@ public class StepService extends Service {
 	 }
 	 mPedometerStart = true;
         mSensor = mSensorManager.getDefaultSensor(
-            Sensor.TYPE_ACCELEROMETER /*| 
+        	Sensor.TYPE_STEP_COUNTER
+        	/*Sensor.TYPE_ACCELEROMETER | 
             Sensor.TYPE_MAGNETIC_FIELD | 
             Sensor.TYPE_ORIENTATION*/);
         mSensorManager.registerListener(mStepDetector,
@@ -255,24 +256,25 @@ public class StepService extends Service {
 
 	public void startPedometer(){
 		registerDetector();
-		mWakeLock.acquire();
+		//mWakeLock.acquire();
 	}
 
 	public void stopPedometer(){
 		unregisterDetector();
-		mWakeLock.release();
+		//mWakeLock.release();
 
 		mPedometerSettings.setTodayStepDistance(mSteps,mDistance);
 	}
     
     public void resetValues() {
-	 if(mStepDisplayer == null || mDistanceNotifier == null || mPedometerSettings == null){
-	 	return;
-	 }
+    	StepDevice.getInstance().sendCmd(StepDevice.CMD_CLEAR_STEP, 0);
+    	if(mStepDisplayer == null || mDistanceNotifier == null || mPedometerSettings == null){
+        	return;
+    	}
         mStepDisplayer.setSteps(mSteps = 0);
         mDistanceNotifier.setDistance(mDistance = 0f);
 		
-	 mPedometerSettings.setTodayStepDistance(0, 0f);
+    	mPedometerSettings.setTodayStepDistance(0, 0f);
     }
     
     /**

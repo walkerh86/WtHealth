@@ -47,5 +47,11 @@ public class StepBuzzer implements StepListener {
     private void buzz() {
         mVibrator.vibrate(50);
     }
+
+	@Override
+	public void onStepValue(int value) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

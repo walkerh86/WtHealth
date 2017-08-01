@@ -67,4 +67,10 @@ public class StepDisplayer implements StepListener{
             listener.stepsChanged((int)mCount);
         }
     }
+
+	@Override
+	public void onStepValue(int value) {
+		mCount = value;
+		notifyListener();
+	}
 }
