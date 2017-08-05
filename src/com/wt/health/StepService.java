@@ -140,6 +140,9 @@ public class StepService extends Service {
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction("android.intent.action.DATE_CHANGED");
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         registerReceiver(mReceiver, filter);
 
 	 String prevTodayTime = mPedometerSettings.getTodayTime();
@@ -343,7 +346,10 @@ public class StepService extends Service {
                     //wakeLock.release();
                     //acquireWakeLock();
                 }*/
-            }else if("android.intent.action.DATE_CHANGED".equals(action)){
+            }else if("android.intent.action.DATE_CHANGED".equals(action)
+            		|| Intent.ACTION_TIME_TICK.equals(action)
+            		|| Intent.ACTION_TIME_CHANGED.equals(action)
+            		|| Intent.ACTION_TIMEZONE_CHANGED.equals(action)){
             	  mHandler.post(mDateChangeRunnable);
             }
         }
