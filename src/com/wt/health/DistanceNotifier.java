@@ -83,13 +83,13 @@ public class DistanceNotifier implements StepListener{
 	@Override
 	public void onStepValue(int value) {
 		if (mIsMetric) {
-            mDistance += (float)(// kilometers
-                mStepLength // centimeters
+            mDistance = (float)(// kilometers
+                value*mStepLength // centimeters
                 / 100000.0); // centimeters/kilometer
         }
         else {
-            mDistance += (float)(// miles
-                mStepLength // inches
+            mDistance = (float)(// miles
+                value*mStepLength // inches
                 / 63360.0); // inches/mile
         }
         
