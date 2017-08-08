@@ -30,17 +30,23 @@ jint Java_com_wt_health_StepDevice_nativeCmd(JNIEnv* env, jobject obj, jint cmd,
 	int dev = -1;
 	int count;
 
-	strcpy(dev_name, "/dev/bm2260m_dev");
+	//strcpy(dev_name, "/dev/bm2260m_dev");
+	strcpy(dev_name, "/sys/bus/platform/drivers/step_counter/cmd");
 	dev = open(dev_name, O_WRONLY);
 	if (dev < 0)  {
 		LOGI("error open dev=%d",dev);
 		return 0;
 	}
-	LOGI("open dev=%d",dev);
-	ioctl(dev,cmd,param);
+	LOGI("open dev=%d,cmd=%d",dev,cmd);
+	//ioctl(dev,cmd,param);
+	char buf[2] = {0};
+	//sprintf(buf, "%d", cmd);
+	buf[0] = cmd;
+	write(dev,buf,strlen(buf)+1);
 
 	if (close(dev) != 0) {
 		LOGI("close dev error");
 		return 0;
 	}
+	return 0;
 }

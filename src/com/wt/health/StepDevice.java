@@ -1,9 +1,9 @@
 package com.wt.health;
 
 public class StepDevice {
-	public static final int CMD_ENABLE_STEP = 0;
-	public static final int CMD_DISABLE_STEP = 1;
-	public static final int CMD_CLEAR_STEP = 2;
+	public static final int CMD_ENABLE_STEP = 1;
+	public static final int CMD_DISABLE_STEP = 2;
+	public static final int CMD_CLEAR_STEP = 3;
 	
 	private static StepDevice mInstance;
 	
